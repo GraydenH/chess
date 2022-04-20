@@ -14,9 +14,11 @@ use graphics::rectangle::square;
 use std::path::Path;
 use opengl_graphics::TextureSettings;
 use ndarray::Array2;
+use std::borrow::Borrow;
 
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
+    fen: String
 }
 
 #[repr(u8)]
@@ -35,6 +37,44 @@ enum Piece {
     WhiteBishop = 10,
     WhiteQueen = 11,
     WhiteKing = 12,
+}
+
+fn load_fen(fen: &str) -> Array2<u8> {
+    let mut array = Array2::zeros((8, 8));
+    array[[1, 0]] = Piece::BlackPawn as u8;
+    array[[1, 1]] = Piece::BlackPawn as u8;
+    array[[1, 2]] = Piece::BlackPawn as u8;
+    array[[1, 3]] = Piece::BlackPawn as u8;
+    array[[1, 4]] = Piece::BlackPawn as u8;
+    array[[1, 5]] = Piece::BlackPawn as u8;
+    array[[1, 6]] = Piece::BlackPawn as u8;
+    array[[1, 7]] = Piece::BlackPawn as u8;
+    array[[0, 0]] = Piece::BlackRook as u8;
+    array[[0, 1]] = Piece::BlackKnight as u8;
+    array[[0, 2]] = Piece::BlackBishop as u8;
+    array[[0, 3]] = Piece::BlackQueen as u8;
+    array[[0, 4]] = Piece::BlackKing as u8;
+    array[[0, 5]] = Piece::BlackBishop as u8;
+    array[[0, 6]] = Piece::BlackKnight as u8;
+    array[[0, 7]] = Piece::BlackRook as u8;
+
+    array[[6, 0]] = Piece::WhitePawn as u8;
+    array[[6, 1]] = Piece::WhitePawn as u8;
+    array[[6, 2]] = Piece::WhitePawn as u8;
+    array[[6, 3]] = Piece::WhitePawn as u8;
+    array[[6, 4]] = Piece::WhitePawn as u8;
+    array[[6, 5]] = Piece::WhitePawn as u8;
+    array[[6, 6]] = Piece::WhitePawn as u8;
+    array[[6, 7]] = Piece::WhitePawn as u8;
+    array[[7, 0]] = Piece::WhiteRook as u8;
+    array[[7, 1]] = Piece::WhiteKnight as u8;
+    array[[7, 2]] = Piece::WhiteBishop as u8;
+    array[[7, 3]] = Piece::WhiteQueen as u8;
+    array[[7, 4]] = Piece::WhiteKing as u8;
+    array[[7, 5]] = Piece::WhiteBishop as u8;
+    array[[7, 6]] = Piece::WhiteKnight as u8;
+    array[[7, 7]] = Piece::WhiteRook as u8;
+    return array;
 }
 
 impl App {
@@ -62,40 +102,7 @@ impl App {
 
         let square = rectangle::square(0.0, 0.0, 128.0);
 
-        let mut array = Array2::zeros((8, 8));
-        array[[1, 0]] = Piece::BlackPawn as u8;
-        array[[1, 1]] = Piece::BlackPawn as u8;
-        array[[1, 2]] = Piece::BlackPawn as u8;
-        array[[1, 3]] = Piece::BlackPawn as u8;
-        array[[1, 4]] = Piece::BlackPawn as u8;
-        array[[1, 5]] = Piece::BlackPawn as u8;
-        array[[1, 6]] = Piece::BlackPawn as u8;
-        array[[1, 7]] = Piece::BlackPawn as u8;
-        array[[0, 0]] = Piece::BlackRook as u8;
-        array[[0, 1]] = Piece::BlackKnight as u8;
-        array[[0, 2]] = Piece::BlackBishop as u8;
-        array[[0, 3]] = Piece::BlackQueen as u8;
-        array[[0, 4]] = Piece::BlackKing as u8;
-        array[[0, 5]] = Piece::BlackBishop as u8;
-        array[[0, 6]] = Piece::BlackKnight as u8;
-        array[[0, 7]] = Piece::BlackRook as u8;
-
-        array[[6, 0]] = Piece::WhitePawn as u8;
-        array[[6, 1]] = Piece::WhitePawn as u8;
-        array[[6, 2]] = Piece::WhitePawn as u8;
-        array[[6, 3]] = Piece::WhitePawn as u8;
-        array[[6, 4]] = Piece::WhitePawn as u8;
-        array[[6, 5]] = Piece::WhitePawn as u8;
-        array[[6, 6]] = Piece::WhitePawn as u8;
-        array[[6, 7]] = Piece::WhitePawn as u8;
-        array[[7, 0]] = Piece::WhiteRook as u8;
-        array[[7, 1]] = Piece::WhiteKnight as u8;
-        array[[7, 2]] = Piece::WhiteBishop as u8;
-        array[[7, 3]] = Piece::WhiteQueen as u8;
-        array[[7, 4]] = Piece::WhiteKing as u8;
-        array[[7, 5]] = Piece::WhiteBishop as u8;
-        array[[7, 6]] = Piece::WhiteKnight as u8;
-        array[[7, 7]] = Piece::WhiteRook as u8;
+        let array = load_fen(self.fen.borrow());
 
         self.gl.draw(args.viewport(), |c, gl| {
             // Clear the screen.
@@ -162,6 +169,7 @@ fn main() {
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
+        fen: String::from("")
     };
 
     let mut events = Events::new(EventSettings::new());
