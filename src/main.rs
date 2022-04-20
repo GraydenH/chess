@@ -28,7 +28,7 @@ enum Piece {
     BlackBishop = 4,
     BlackQueen = 5,
     BlackKing = 6,
-    
+
     WhitePawn = 7,
     WhiteRook = 8,
     WhiteKnight = 9,
@@ -44,23 +44,23 @@ impl App {
         const LIGHT: [f32; 4] = [0.84, 0.71, 0.55, 1.0]; // D7B68B
         const DARK: [f32; 4] = [0.16, 0.11, 0.05, 1.0]; // 2A1D0C
 
-        let white_king_image= Image::new().src_rect([0.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
-        let white_queen_image= Image::new().src_rect([333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
-        let white_bishop_image= Image::new().src_rect([2.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
-        let white_knight_image= Image::new().src_rect([3.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
-        let white_rook_image= Image::new().src_rect([4.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
-        let white_pawn_image= Image::new().src_rect([5.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
+        let white_king_image= Image::new().src_rect([0.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_queen_image= Image::new().src_rect([333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_bishop_image= Image::new().src_rect([2.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_knight_image= Image::new().src_rect([3.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_rook_image= Image::new().src_rect([4.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_pawn_image= Image::new().src_rect([5.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
 
-        let black_king_image= Image::new().src_rect([0.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
-        let black_queen_image= Image::new().src_rect([333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
-        let black_bishop_image= Image::new().src_rect([2.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
-        let black_knight_image= Image::new().src_rect([3.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
-        let black_rook_image= Image::new().src_rect([4.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
-        let black_pawn_image= Image::new().src_rect([5.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 64.0));
+        let black_king_image= Image::new().src_rect([0.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_queen_image= Image::new().src_rect([333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_bishop_image= Image::new().src_rect([2.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_knight_image= Image::new().src_rect([3.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_rook_image= Image::new().src_rect([4.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_pawn_image= Image::new().src_rect([5.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
 
         let pieces_texture = Texture::from_path(Path::new("pieces.png"), &TextureSettings::new()).unwrap();
 
-        let square = rectangle::square(0.0, 0.0, 64.0);
+        let square = rectangle::square(0.0, 0.0, 128.0);
 
         let mut array = Array2::zeros((8, 8));
         array[[1, 0]] = Piece::BlackPawn as u8;
@@ -103,8 +103,8 @@ impl App {
 
             for i in 0..8 {
                 for j in 0..8 {
-                    let y = (i as f64) * 64.0;
-                    let x = (j as f64) * 64.0;
+                    let y = (i as f64) * 128.0;
+                    let x = (j as f64) * 128.0;
                     let transform = c
                         .transform
                         .trans(x, y);
@@ -153,7 +153,7 @@ fn main() {
     let opengl = OpenGL::V3_2;
 
     // Create an Glutin window.
-    let mut window: Window = WindowSettings::new("chess", [512, 512])
+    let mut window: Window = WindowSettings::new("chess", [1024, 1024])
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
