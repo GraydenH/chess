@@ -58,7 +58,7 @@ impl App {
         let black_rook_image= Image::new().src_rect([4.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
         let black_pawn_image= Image::new().src_rect([5.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
 
-        let pieces_texture = Texture::from_path(Path::new("pieces.png"), &TextureSettings::new()).unwrap();
+        let pieces_texture = Texture::from_path(Path::new("assets/textures/pieces.png"), &TextureSettings::new()).unwrap();
 
         let square = rectangle::square(0.0, 0.0, 128.0);
 
