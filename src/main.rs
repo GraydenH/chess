@@ -79,19 +79,19 @@ impl App {
         const LIGHT: [f32; 4] = [0.84, 0.71, 0.55, 1.0]; // D7B68B
         const DARK: [f32; 4] = [0.16, 0.11, 0.05, 1.0]; // 2A1D0C
 
-        let white_king_image= Image::new().src_rect([0.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let white_queen_image= Image::new().src_rect([333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let white_bishop_image= Image::new().src_rect([2.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let white_knight_image= Image::new().src_rect([3.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let white_rook_image= Image::new().src_rect([4.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let white_pawn_image= Image::new().src_rect([5.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_king_image = Image::new().src_rect([0.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_queen_image = Image::new().src_rect([333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_bishop_image = Image::new().src_rect([2.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_knight_image = Image::new().src_rect([3.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_rook_image = Image::new().src_rect([4.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_pawn_image = Image::new().src_rect([5.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
 
-        let black_king_image= Image::new().src_rect([0.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let black_queen_image= Image::new().src_rect([333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let black_bishop_image= Image::new().src_rect([2.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let black_knight_image= Image::new().src_rect([3.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let black_rook_image= Image::new().src_rect([4.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let black_pawn_image= Image::new().src_rect([5.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_king_image = Image::new().src_rect([0.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_queen_image = Image::new().src_rect([333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_bishop_image = Image::new().src_rect([2.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_knight_image = Image::new().src_rect([3.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_rook_image = Image::new().src_rect([4.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_pawn_image = Image::new().src_rect([5.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
 
         let square = rectangle::square(0.0, 0.0, 128.0);
 
