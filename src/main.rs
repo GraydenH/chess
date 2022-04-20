@@ -73,7 +73,7 @@ fn load_fen(fen: &str) -> Array2<u8> {
 }
 
 impl App {
-    fn render(&mut self, args: &RenderArgs) {
+    fn render(&mut self, args: &RenderArgs, pieces_texture: &Texture) {
         use graphics::*;
 
         const LIGHT: [f32; 4] = [0.84, 0.71, 0.55, 1.0]; // D7B68B
@@ -92,8 +92,6 @@ impl App {
         let black_knight_image= Image::new().src_rect([3.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
         let black_rook_image= Image::new().src_rect([4.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
         let black_pawn_image= Image::new().src_rect([5.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-
-        let pieces_texture = Texture::from_path(Path::new("assets/textures/pieces.png"), &TextureSettings::new()).unwrap();
 
         let square = rectangle::square(0.0, 0.0, 128.0);
 
@@ -118,31 +116,31 @@ impl App {
                     
                     if array[[i, j]] & 16 == 0 {
                         if array[[i, j]] == Piece::Pawn as u8 {
-                            black_pawn_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            black_pawn_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] == Piece::Rook as u8 {
-                            black_rook_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            black_rook_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] == Piece::Knight as u8 {
-                            black_knight_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            black_knight_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] == Piece::Bishop as u8 {
-                            black_bishop_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            black_bishop_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] == Piece::Queen as u8 {
-                            black_queen_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            black_queen_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] == Piece::King as u8 {
-                            black_king_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            black_king_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         }
                     } else {
                         if array[[i, j]] & 15 == Piece::Pawn as u8 {
-                            white_pawn_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            white_pawn_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] & 15 == Piece::Rook as u8 {
-                            white_rook_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            white_rook_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] & 15 == Piece::Knight as u8 {
-                            white_knight_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            white_knight_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] & 15 == Piece::Bishop as u8 {
-                            white_bishop_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            white_bishop_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] & 15 == Piece::Queen as u8 {
-                            white_queen_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            white_queen_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] & 15 == Piece::King as u8 {
-                            white_king_image.draw(&pieces_texture, &c.draw_state, transform, gl);
+                            white_king_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         }
                     }
                 }
@@ -168,10 +166,12 @@ fn main() {
         fen: String::from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     };
 
+    let pieces_texture = Texture::from_path(Path::new("assets/textures/pieces.png"), &TextureSettings::new()).unwrap();
+
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
-            app.render(&args);
+            app.render(&args, &pieces_texture);
         }
     }
 }
