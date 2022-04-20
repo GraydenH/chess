@@ -24,57 +24,52 @@ pub struct App {
 #[repr(u8)]
 #[derive(Clone, Copy)]
 enum Piece {
-    BlackPawn = 1,
-    BlackRook = 2,
-    BlackKnight = 3,
-    BlackBishop = 4,
-    BlackQueen = 5,
-    BlackKing = 6,
+    Empty = 0,
 
-    WhitePawn = 7,
-    WhiteRook = 8,
-    WhiteKnight = 9,
-    WhiteBishop = 10,
-    WhiteQueen = 11,
-    WhiteKing = 12,
+    Pawn = 1,
+    Rook = 2,
+    Knight = 3,
+    Bishop = 4,
+    Queen = 5,
+    King = 6,
+}
+
+impl Piece {
+    fn from_symbol(c: char) -> Piece {
+        return match c.to_ascii_lowercase() {
+            'k' => Piece::King,
+            'p' => Piece::Pawn,
+            'n' => Piece::Knight,
+            'b' => Piece::Bishop,
+            'r' => Piece::Rook,
+            'q' => Piece::Queen,
+            _ => Piece::Empty
+        }
+    }
 }
 
 fn load_fen(fen: &str) -> Array2<u8> {
-    let mut array = Array2::zeros((8, 8));
-    array[[1, 0]] = Piece::BlackPawn as u8;
-    array[[1, 1]] = Piece::BlackPawn as u8;
-    array[[1, 2]] = Piece::BlackPawn as u8;
-    array[[1, 3]] = Piece::BlackPawn as u8;
-    array[[1, 4]] = Piece::BlackPawn as u8;
-    array[[1, 5]] = Piece::BlackPawn as u8;
-    array[[1, 6]] = Piece::BlackPawn as u8;
-    array[[1, 7]] = Piece::BlackPawn as u8;
-    array[[0, 0]] = Piece::BlackRook as u8;
-    array[[0, 1]] = Piece::BlackKnight as u8;
-    array[[0, 2]] = Piece::BlackBishop as u8;
-    array[[0, 3]] = Piece::BlackQueen as u8;
-    array[[0, 4]] = Piece::BlackKing as u8;
-    array[[0, 5]] = Piece::BlackBishop as u8;
-    array[[0, 6]] = Piece::BlackKnight as u8;
-    array[[0, 7]] = Piece::BlackRook as u8;
+    let mut sections = fen.split(" ");
+    let first = sections.next().unwrap_or("");
 
-    array[[6, 0]] = Piece::WhitePawn as u8;
-    array[[6, 1]] = Piece::WhitePawn as u8;
-    array[[6, 2]] = Piece::WhitePawn as u8;
-    array[[6, 3]] = Piece::WhitePawn as u8;
-    array[[6, 4]] = Piece::WhitePawn as u8;
-    array[[6, 5]] = Piece::WhitePawn as u8;
-    array[[6, 6]] = Piece::WhitePawn as u8;
-    array[[6, 7]] = Piece::WhitePawn as u8;
-    array[[7, 0]] = Piece::WhiteRook as u8;
-    array[[7, 1]] = Piece::WhiteKnight as u8;
-    array[[7, 2]] = Piece::WhiteBishop as u8;
-    array[[7, 3]] = Piece::WhiteQueen as u8;
-    array[[7, 4]] = Piece::WhiteKing as u8;
-    array[[7, 5]] = Piece::WhiteBishop as u8;
-    array[[7, 6]] = Piece::WhiteKnight as u8;
-    array[[7, 7]] = Piece::WhiteRook as u8;
-    return array;
+    let mut result = Array2::zeros((8, 8));
+
+    let mut file = 0usize;
+    let mut rank = 7usize;
+    for c in first.chars() {
+        if c == '/' {
+            file = 0;
+            rank -= 1;
+        } else if c.is_digit(10) {
+            file += c.to_digit(10).unwrap_or(0) as usize;
+        } else {
+            let color = if c.is_uppercase() { 16u8 } else { 0u8 };
+            result[[rank, file]] = Piece::from_symbol(c) as u8 | color;
+            file += 1;
+        }
+    }
+
+    return result;
 }
 
 impl App {
@@ -124,30 +119,34 @@ impl App {
                     let transform_piece = c
                         .transform
                         .trans(x, y);
-                    if array[[i, j]] == Piece::BlackPawn as u8 {
-                        black_pawn_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
-                    } else if array[[i, j]] == Piece::BlackRook as u8 {
-                        black_rook_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
-                    } else if array[[i, j]] == Piece::BlackKnight as u8 {
-                        black_knight_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
-                    } else if array[[i, j]] == Piece::BlackBishop as u8 {
-                        black_bishop_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
-                    } else if array[[i, j]] == Piece::BlackQueen as u8 {
-                        black_queen_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
-                    } else if array[[i, j]] == Piece::BlackKing as u8 {
-                        black_king_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
-                    } else if array[[i, j]] == Piece::WhitePawn as u8 {
-                        white_pawn_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
-                    } else if array[[i, j]] == Piece::WhiteRook as u8 {
-                        white_rook_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
-                    } else if array[[i, j]] == Piece::WhiteKnight as u8 {
-                        white_knight_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
-                    } else if array[[i, j]] == Piece::WhiteBishop as u8 {
-                        white_bishop_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
-                    } else if array[[i, j]] == Piece::WhiteQueen as u8 {
-                        white_queen_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
-                    } else if array[[i, j]] == Piece::WhiteKing as u8 {
-                        white_king_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                    if array[[i, j]] & 16 == 0 {
+                        if array[[i, j]] == Piece::Pawn as u8 {
+                            black_pawn_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        } else if array[[i, j]] == Piece::Rook as u8 {
+                            black_rook_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        } else if array[[i, j]] == Piece::Knight as u8 {
+                            black_knight_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        } else if array[[i, j]] == Piece::Bishop as u8 {
+                            black_bishop_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        } else if array[[i, j]] == Piece::Queen as u8 {
+                            black_queen_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        } else if array[[i, j]] == Piece::King as u8 {
+                            black_king_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        }
+                    } else {
+                        if array[[i, j]] == Piece::Pawn as u8 {
+                            white_pawn_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        } else if array[[i, j]] == Piece::Rook as u8 {
+                            white_rook_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        } else if array[[i, j]] == Piece::Knight as u8 {
+                            white_knight_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        } else if array[[i, j]] == Piece::Bishop as u8 {
+                            white_bishop_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        } else if array[[i, j]] == Piece::Queen as u8 {
+                            white_queen_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        } else if array[[i, j]] == Piece::King as u8 {
+                            white_king_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                        }
                     }
                 }
             }
@@ -169,7 +168,7 @@ fn main() {
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
-        fen: String::from("")
+        fen: String::from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     };
 
     let mut events = Events::new(EventSettings::new());
