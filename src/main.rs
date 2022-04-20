@@ -41,7 +41,6 @@ impl App {
                     }
                 }
             }
-            println!("end");
         });
     }
 
