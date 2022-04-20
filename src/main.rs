@@ -115,37 +115,34 @@ impl App {
                     } else {
                         rectangle(DARK, square, transform, gl);
                     }
-
-                    let transform_piece = c
-                        .transform
-                        .trans(x, y);
+                    
                     if array[[i, j]] & 16 == 0 {
                         if array[[i, j]] == Piece::Pawn as u8 {
-                            black_pawn_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            black_pawn_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] == Piece::Rook as u8 {
-                            black_rook_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            black_rook_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] == Piece::Knight as u8 {
-                            black_knight_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            black_knight_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] == Piece::Bishop as u8 {
-                            black_bishop_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            black_bishop_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] == Piece::Queen as u8 {
-                            black_queen_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            black_queen_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] == Piece::King as u8 {
-                            black_king_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            black_king_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         }
                     } else {
                         if array[[i, j]] & 15 == Piece::Pawn as u8 {
-                            white_pawn_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            white_pawn_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] & 15 == Piece::Rook as u8 {
-                            white_rook_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            white_rook_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] & 15 == Piece::Knight as u8 {
-                            white_knight_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            white_knight_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] & 15 == Piece::Bishop as u8 {
-                            white_bishop_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            white_bishop_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] & 15 == Piece::Queen as u8 {
-                            white_queen_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            white_queen_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         } else if array[[i, j]] & 15 == Piece::King as u8 {
-                            white_king_image.draw(&pieces_texture, &c.draw_state, transform_piece, gl);
+                            white_king_image.draw(&pieces_texture, &c.draw_state, transform, gl);
                         }
                     }
                 }
