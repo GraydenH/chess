@@ -4,11 +4,14 @@ extern crate opengl_graphics;
 extern crate piston;
 
 use glutin_window::GlutinWindow as Window;
-use opengl_graphics::{GlGraphics, OpenGL};
+use opengl_graphics::{GlGraphics, OpenGL, Texture};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
 use graphics::color::{WHITE, BLACK, GREEN};
+use graphics::rectangle::square;
+use std::path::Path;
+use opengl_graphics::TextureSettings;
 
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
@@ -21,6 +24,11 @@ impl App {
 
         const LIGHT: [f32; 4] = [0.84, 0.71, 0.55, 1.0]; // D7B68B
         const DARK: [f32; 4] = [0.16, 0.11, 0.05, 1.0]; // 2A1D0C
+
+        // Create the image object and attach a square Rectangle object inside.
+        let image= Image::new().rect(square(0.0, 0.0, 64.0));
+        // A texture to use with the image
+        let texture = Texture::from_path(Path::new("black_pawn.png"), &TextureSettings::new()).unwrap();
 
         let square = rectangle::square(0.0, 0.0, 64.0);
         self.gl.draw(args.viewport(), |c, gl| {
@@ -39,6 +47,11 @@ impl App {
                     } else {
                         rectangle(DARK, square, transform, gl);
                     }
+
+                    let transform_piece = c
+                        .transform
+                        .trans(x, y);
+                    image.draw(&texture, &c.draw_state, transform_piece, gl);
                 }
             }
         });
