@@ -8,7 +8,7 @@ use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
-use graphics::color::{WHITE, BLACK};
+use graphics::color::{WHITE, BLACK, GREEN};
 
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
@@ -19,8 +19,8 @@ impl App {
     fn render(&mut self, args: &RenderArgs) {
         use graphics::*;
 
-        const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
-        const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
+        const LIGHT: [f32; 4] = [0.84, 0.71, 0.55, 1.0]; // D7B68B
+        const DARK: [f32; 4] = [0.16, 0.11, 0.05, 1.0]; // 2A1D0C
 
         let square = rectangle::square(0.0, 0.0, 64.0);
         self.gl.draw(args.viewport(), |c, gl| {
@@ -35,9 +35,9 @@ impl App {
                         .transform
                         .trans(x, y);
                     if (i + j) % 2 == 0 {
-                        rectangle(WHITE, square, transform, gl);
+                        rectangle(LIGHT, square, transform, gl);
                     } else {
-                        rectangle(BLACK, square, transform, gl);
+                        rectangle(DARK, square, transform, gl);
                     }
                 }
             }
