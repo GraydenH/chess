@@ -20,9 +20,11 @@ use piston::{MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent, ButtonState
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
     square: f64,
-    grid: Array2<u8>,
+    grid: Array2<u16>,
     mousex: f64,
     mousey: f64,
+    piece: Option<u16>,
+    is_playing_white: bool
 }
 
 #[repr(u8)]
@@ -52,39 +54,34 @@ impl Piece {
     }
 }
 
-fn load_fen(fen: &str) -> Array2<u8> {
+fn load_fen(fen: &str) -> Array2<u16> {
     let mut sections = fen.split(" ");
     let first = sections.next().unwrap_or("");
 
     let mut result = Array2::zeros((8, 8));
 
     let mut file = 0usize;
-    let mut rank = 7usize;
+    let mut rank = 0usize;
     for c in first.chars() {
         if c == '/' {
             file = 0;
-            rank -= 1;
+            rank += 1;
         } else if c.is_digit(10) {
             file += c.to_digit(10).unwrap_or(0) as usize;
         } else {
-            let color = if c.is_uppercase() { 16u8 } else { 0u8 };
-            result[[rank, file]] = Piece::from_symbol(c) as u8 | color;
+            let color = if c.is_uppercase() { 16 } else { 0 };
+            result[[rank, file]] = Piece::from_symbol(c) as u16 | color;
             file += 1;
         }
     }
-    result.invert_axis(Axis { 0: 0 });
-    result.invert_axis(Axis { 0: 1});
     return result;
 }
 
-fn get_square(screenx: f64, screeny: f64, square_size: f64) -> u8 {
+fn get_coords(screenx: f64, screeny: f64, square_size: f64) -> (usize, usize) {
     let x = screenx / square_size;
     let y = (square_size * 8.0 - screeny) / square_size;
 
-    let integerx = x as u8;
-    let integery = y as u8;
-
-    return integery * 8 + integerx;
+    return (x as usize, y as usize);
 }
 
 impl App {
@@ -112,6 +109,9 @@ impl App {
         let square = rectangle::square(0.0, 0.0, self.square);
 
         let array = &self.grid;
+        let piece = &self.piece;
+        let mousex = self.mousex;
+        let mousey = self.mousey;
 
         self.gl.draw(args.viewport(), |c, gl| {
             // Clear the screen.
@@ -131,33 +131,68 @@ impl App {
                     }
                     
                     if array[[i, j]] & 16 == 0 {
-                        if array[[i, j]] == Piece::Pawn as u8 {
+                        if array[[i, j]] & 15 == Piece::Pawn as u16 {
                             black_pawn_image.draw(pieces_texture, &c.draw_state, transform, gl);
-                        } else if array[[i, j]] == Piece::Rook as u8 {
+                        } else if array[[i, j]] & 15 == Piece::Rook as u16 {
                             black_rook_image.draw(pieces_texture, &c.draw_state, transform, gl);
-                        } else if array[[i, j]] == Piece::Knight as u8 {
+                        } else if array[[i, j]] & 15 == Piece::Knight as u16 {
                             black_knight_image.draw(pieces_texture, &c.draw_state, transform, gl);
-                        } else if array[[i, j]] == Piece::Bishop as u8 {
+                        } else if array[[i, j]] & 15 == Piece::Bishop as u16 {
                             black_bishop_image.draw(pieces_texture, &c.draw_state, transform, gl);
-                        } else if array[[i, j]] == Piece::Queen as u8 {
+                        } else if array[[i, j]] & 15 == Piece::Queen as u16 {
                             black_queen_image.draw(pieces_texture, &c.draw_state, transform, gl);
-                        } else if array[[i, j]] == Piece::King as u8 {
+                        } else if array[[i, j]] & 15 == Piece::King as u16 {
                             black_king_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         }
                     } else {
-                        if array[[i, j]] & 15 == Piece::Pawn as u8 {
+                        if array[[i, j]] & 15 == Piece::Pawn as u16 {
                             white_pawn_image.draw(pieces_texture, &c.draw_state, transform, gl);
-                        } else if array[[i, j]] & 15 == Piece::Rook as u8 {
+                        } else if array[[i, j]] & 15 == Piece::Rook as u16 {
                             white_rook_image.draw(pieces_texture, &c.draw_state, transform, gl);
-                        } else if array[[i, j]] & 15 == Piece::Knight as u8 {
+                        } else if array[[i, j]] & 15 == Piece::Knight as u16 {
                             white_knight_image.draw(pieces_texture, &c.draw_state, transform, gl);
-                        } else if array[[i, j]] & 15 == Piece::Bishop as u8 {
+                        } else if array[[i, j]] & 15 == Piece::Bishop as u16 {
                             white_bishop_image.draw(pieces_texture, &c.draw_state, transform, gl);
-                        } else if array[[i, j]] & 15 == Piece::Queen as u8 {
+                        } else if array[[i, j]] & 15 == Piece::Queen as u16 {
                             white_queen_image.draw(pieces_texture, &c.draw_state, transform, gl);
-                        } else if array[[i, j]] & 15 == Piece::King as u8 {
+                        } else if array[[i, j]] & 15 == Piece::King as u16 {
                             white_king_image.draw(pieces_texture, &c.draw_state, transform, gl);
                         }
+                    }
+                }
+            }
+            
+            if let Some(p) = piece {
+                let transform = c
+                    .transform
+                    .trans(mousex, mousey);
+                if p & 16 == 0 {
+                    if p & 15 == Piece::Pawn as u16 {
+                        black_pawn_image.draw(pieces_texture, &c.draw_state, transform, gl);
+                    } else if p & 15 == Piece::Rook as u16 {
+                        black_rook_image.draw(pieces_texture, &c.draw_state, transform, gl);
+                    } else if p & 15 == Piece::Knight as u16 {
+                        black_knight_image.draw(pieces_texture, &c.draw_state, transform, gl);
+                    } else if p & 15 == Piece::Bishop as u16 {
+                        black_bishop_image.draw(pieces_texture, &c.draw_state, transform, gl);
+                    } else if p & 15 == Piece::Queen as u16 {
+                        black_queen_image.draw(pieces_texture, &c.draw_state, transform, gl);
+                    } else if p & 15 == Piece::King as u16 {
+                        black_king_image.draw(pieces_texture, &c.draw_state, transform, gl);
+                    }
+                } else {
+                    if p & 15 == Piece::Pawn as u16 {
+                        white_pawn_image.draw(pieces_texture, &c.draw_state, transform, gl);
+                    } else if p & 15 == Piece::Rook as u16 {
+                        white_rook_image.draw(pieces_texture, &c.draw_state, transform, gl);
+                    } else if p & 15 == Piece::Knight as u16 {
+                        white_knight_image.draw(pieces_texture, &c.draw_state, transform, gl);
+                    } else if p & 15 == Piece::Bishop as u16 {
+                        white_bishop_image.draw(pieces_texture, &c.draw_state, transform, gl);
+                    } else if p & 15 == Piece::Queen as u16 {
+                        white_queen_image.draw(pieces_texture, &c.draw_state, transform, gl);
+                    } else if p & 15 == Piece::King as u16 {
+                        white_king_image.draw(pieces_texture, &c.draw_state, transform, gl);
                     }
                 }
             }
@@ -165,11 +200,15 @@ impl App {
     }
 
     fn click(&mut self, args: &ButtonArgs) {
-        let index = get_square(self.mousex, self.mousey, self.square);
+        //let (x, y) = get_coords(self.mousex, self.mousey, self.square);
+        let x = (self.mousex / self.square) as usize;
+        let y = (self.mousey / self.square) as usize;
         if args.state == ButtonState::Press {
-            
-        } else {
-
+            self.piece = Some(self.grid[[y, x]].clone());
+            self.grid[[y, x]] = 0;
+        } else if self.piece.is_some() && args.state == ButtonState::Release {
+            self.grid[[y, x]] = self.piece.unwrap_or(Piece::Empty as u16);
+            self.piece = None;
         }
     }
 
@@ -199,9 +238,11 @@ fn main() {
     let mut app = App {
         gl: GlGraphics::new(opengl),
         square: 64.0,
-        grid,
         mousex: 0.0,
         mousey: 0.0,
+        piece: None,
+        is_playing_white: true,
+        grid,
     };
 
     let pieces_texture = Texture::from_path(Path::new("assets/textures/pieces.png"), &TextureSettings::new()).unwrap();
