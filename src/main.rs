@@ -13,12 +13,16 @@ use graphics::color::GREEN;
 use graphics::rectangle::square;
 use std::path::Path;
 use opengl_graphics::TextureSettings;
-use ndarray::Array2;
+use ndarray::{Array2, Axis};
 use std::borrow::Borrow;
+use piston::{MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent, ButtonState, ButtonEvent, Button, Key, MouseButton, ButtonArgs};
 
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
-    fen: String
+    square: f64,
+    grid: Array2<u8>,
+    mousex: f64,
+    mousey: f64,
 }
 
 #[repr(u8)]
@@ -68,8 +72,19 @@ fn load_fen(fen: &str) -> Array2<u8> {
             file += 1;
         }
     }
-
+    result.invert_axis(Axis { 0: 0 });
+    result.invert_axis(Axis { 0: 1});
     return result;
+}
+
+fn get_square(screenx: f64, screeny: f64, square_size: f64) -> u8 {
+    let x = screenx / square_size;
+    let y = (square_size * 8.0 - screeny) / square_size;
+
+    let integerx = x as u8;
+    let integery = y as u8;
+
+    return integery * 8 + integerx;
 }
 
 impl App {
@@ -79,23 +94,24 @@ impl App {
         const LIGHT: [f32; 4] = [0.84, 0.71, 0.55, 1.0]; // D7B68B
         const DARK: [f32; 4] = [0.16, 0.11, 0.05, 1.0]; // 2A1D0C
 
-        let white_king_image = Image::new().src_rect([0.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let white_queen_image = Image::new().src_rect([333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let white_bishop_image = Image::new().src_rect([2.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let white_knight_image = Image::new().src_rect([3.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let white_rook_image = Image::new().src_rect([4.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let white_pawn_image = Image::new().src_rect([5.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let white_king_image = Image::new().src_rect([0.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
+        let white_queen_image = Image::new().src_rect([333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
+        let white_bishop_image = Image::new().src_rect([2.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
+        let white_knight_image = Image::new().src_rect([3.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
+        let white_rook_image = Image::new().src_rect([4.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
+        let white_pawn_image = Image::new().src_rect([5.0 * 333.0, 0.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
 
-        let black_king_image = Image::new().src_rect([0.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let black_queen_image = Image::new().src_rect([333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let black_bishop_image = Image::new().src_rect([2.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let black_knight_image = Image::new().src_rect([3.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let black_rook_image = Image::new().src_rect([4.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
-        let black_pawn_image = Image::new().src_rect([5.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, 128.0));
+        let black_king_image = Image::new().src_rect([0.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
+        let black_queen_image = Image::new().src_rect([333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
+        let black_bishop_image = Image::new().src_rect([2.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
+        let black_knight_image = Image::new().src_rect([3.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
+        let black_rook_image = Image::new().src_rect([4.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
+        let black_pawn_image = Image::new().src_rect([5.0 * 333.0, 333.0, 333.0, 333.0]).rect(square(0.0, 0.0, self.square));
 
-        let square = rectangle::square(0.0, 0.0, 128.0);
+        let square_length = self.square;
+        let square = rectangle::square(0.0, 0.0, self.square);
 
-        let array = load_fen(self.fen.borrow());
+        let array = &self.grid;
 
         self.gl.draw(args.viewport(), |c, gl| {
             // Clear the screen.
@@ -103,8 +119,8 @@ impl App {
 
             for i in 0..8 {
                 for j in 0..8 {
-                    let y = (i as f64) * 128.0;
-                    let x = (j as f64) * 128.0;
+                    let y = (i as f64) * square_length;
+                    let x = (j as f64) * square_length;
                     let transform = c
                         .transform
                         .trans(x, y);
@@ -147,6 +163,23 @@ impl App {
             }
         });
     }
+
+    fn click(&mut self, args: &ButtonArgs) {
+        let index = get_square(self.mousex, self.mousey, self.square);
+        if args.state == ButtonState::Press {
+            
+        } else {
+
+        }
+    }
+
+    fn set_mousex(&mut self, x: f64) {
+        self.mousex = x;
+    }
+
+    fn set_mousey(&mut self, y: f64) {
+        self.mousey = y;
+    }
 }
 
 fn main() {
@@ -154,16 +187,21 @@ fn main() {
     let opengl = OpenGL::V3_2;
 
     // Create an Glutin window.
-    let mut window: Window = WindowSettings::new("chess", [1024, 1024])
+    let mut window: Window = WindowSettings::new("chess", [512, 512])
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
         .unwrap();
 
+    let grid = load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
-        fen: String::from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+        square: 64.0,
+        grid,
+        mousex: 0.0,
+        mousey: 0.0,
     };
 
     let pieces_texture = Texture::from_path(Path::new("assets/textures/pieces.png"), &TextureSettings::new()).unwrap();
@@ -172,6 +210,17 @@ fn main() {
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
             app.render(&args, &pieces_texture);
+        }
+        if let Some(args) = e.mouse_cursor_args() {
+            let [x, y] = args;
+            app.set_mousex(x);
+            app.set_mousey(y);
+        }
+        if let Some(args) = e.button_args() {
+            match args.button {
+                Button::Mouse(MouseButton::Left) => app.click(&args),
+                _ => (),
+            }
         }
     }
 }
